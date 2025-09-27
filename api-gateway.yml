@@ -34,13 +34,13 @@ management:
   endpoints:
     web:
       exposure:
-        include: gateway,health,info,metrics,routes
+        include: health,info,metrics,routes
       base-path: /actuator
   endpoint:
-    gateway:
-      enabled: true
     health:
       show-details: always
+  gateway:
+    enabled: true
 
 resilience4j:
   circuitbreaker:
