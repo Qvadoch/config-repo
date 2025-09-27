@@ -1,34 +1,40 @@
 spring:
   application:
     name: task-service
+  datasource:
+    url: jdbc:postgresql://localhost:5433/task_bd
+    username: postgres
+    password: 123
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 
 server:
   port: 8081
 
-datasource:
-  url: jdbc:postgresql://localhost:5433/task_bd
-  username: postgres
-  password: 123
-  driver-class-name: org.postgresql.Driver
-
-jpa:
-  hibernate:
-    ddl-auto: update
-  show-sql: true
-  properties:
-    hibernate:
-      format_sql: true
-
 eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
   instance:
-    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    instance-id: ${spring.application.name}:${random.value}
     prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,env,beans
+        include: health,info,metrics
+      base-path: /actuator
   endpoint:
     health:
       show-details: always
@@ -38,5 +44,4 @@ logging:
   level:
     org.example.task: DEBUG
     org.hibernate.SQL: DEBUG
-    org.hibernate.type: TRACE
-    org.springframework.web: DEBUG
+    org.springframework.cloud: INFO
