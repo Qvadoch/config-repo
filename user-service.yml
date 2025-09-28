@@ -132,22 +132,6 @@ resilience4j:
         ignoreExceptions:
           - com.example.userservice.exception.UserAlreadyExistsException
           - org.springframework.validation.BindException
-  retry:
-    instances:
-      userService:
-        maxAttempts: 3
-        waitDuration: 500ms
-        enableExponentialBackoff: true
-        exponentialBackoffMultiplier: 2
-  timelimiter:
-    instances:
-      userService:
-        timeoutDuration: 3s
-  bulkhead:
-    instances:
-      userService:
-        maxConcurrentCalls: 25
-        maxWaitDuration: 0
 
 # Logging Configuration
 logging:
