@@ -196,7 +196,6 @@ decorator:
     enable: true
     enable-p6spy: false
 
-# Health Check Configuration
 health:
   db:
     enabled: true
