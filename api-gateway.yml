@@ -16,22 +16,6 @@ spring:
               args:
                 name: taskService
                 fallbackUri: forward:/fallback/task-service
-        # ⬅️ ДОБАВЬТЕ fallback маршрут
-        - id: task-service-fallback
-          uri: no://op
-          predicates:
-            - Path=/fallback/task-service
-          filters:
-            - name: SetStatus
-              args:
-                status: 503
-            - name: SetResponseHeader
-              args:
-                name: Content-Type
-                value: application/json
-            - name: SetResponseBody
-              args:
-                value: '{"message": "Task Service is temporarily unavailable"}'
 
 server:
   port: 8099
