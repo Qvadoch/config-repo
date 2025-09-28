@@ -7,6 +7,12 @@ spring:
         locator:
           enabled: false
       routes:
+        - id: frontend
+          uri: http://localhost:3000
+          predicates:
+            - Path=/
+          filters:
+            - RewritePath=/(?<segment>.*), /$\{segment}
         - id: task-service
           uri: lb://task-service
           predicates:
