@@ -6,6 +6,10 @@ spring:
     username: postgres
     password: 123
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
   jpa:
     hibernate:
       ddl-auto: update
@@ -28,20 +32,41 @@ eureka:
     prefer-ip-address: true
     lease-renewal-interval-in-seconds: 5
     lease-expiration-duration-in-seconds: 10
-
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,loggers,circuitbreakers,prometheus
       base-path: /actuator
   endpoint:
+    prometheus:
+      enabled: true
     health:
       show-details: always
       show-components: always
 
+resilience4j:
+  circuitbreaker:
+    instances:
+      taskService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+  timelimiter:
+    instances:
+      taskService:
+        timeoutDuration: 5s
+
 logging:
   level:
-    org.example.task: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.springframework.cloud: INFO
+    org.hibernate.type: TRACE
+    org.springframework.orm.jpa: DEBUG
+    org.springframework.transaction: DEBUG
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+  file:
+    max-size: 10MB
+    max-history: 7

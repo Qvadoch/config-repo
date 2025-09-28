@@ -5,7 +5,7 @@ spring:
     gateway:
       discovery:
         locator:
-          enabled: false  # ⬅️ ОТКЛЮЧИТЕ автоматическое обнаружение всех сервисов
+          enabled: false
       routes:
         - id: task-service
           uri: lb://task-service
@@ -16,6 +16,15 @@ spring:
               args:
                 name: taskService
                 fallbackUri: forward:/fallback/task-service
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/auth/**,/api/users/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: userService
+                fallbackUri: forward:/fallback/user-service
 
 server:
   port: 8099
@@ -48,18 +57,36 @@ management:
 
 resilience4j:
   circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
     instances:
       taskService:
-        registerHealthIndicator: true
-        failureRateThreshold: 50
-        minimumNumberOfCalls: 5
-        waitDurationInOpenState: 5s
-        permittedNumberOfCallsInHalfOpenState: 3
-        slidingWindowSize: 10
-        slidingWindowType: COUNT_BASED
+        baseConfig: default
+      notificationService:
+        baseConfig: default
+      analyticsService:
+        baseConfig: default
+
+  timelimiter:
+    configs:
+      default:
+        timeoutDuration: 5s
+    instances:
+      taskService:
+        baseConfig: default
 
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG
-    org.springframework.boot.actuate: DEBUG
-    org.example.gateway: DEBUG
+    org.springframework.cloud.circuitbreaker: DEBUG
+    reactor.netty: DEBUG
+    org.example.gateway: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/api-gateway.log

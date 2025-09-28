@@ -1,0 +1,232 @@
+# config-repo-main/user-service.yml
+spring:
+  application:
+    name: user-service
+  datasource:
+    url: jdbc:postgresql://localhost:5433/user_bd
+    username: postgres
+    password: 123
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 300000
+      max-lifetime: 1200000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+        show_sql: false
+    show-sql: false
+  cloud:
+    config:
+      enabled: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+    date-format: com.fasterxml.jackson.databind.util.StdDateFormat
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret-value: ${JWT_SECRET:mySuperSecretKeyForJWTGeneration123456789012345678901234567890}
+
+# Server Configuration
+server:
+  port: 8081
+  servlet:
+    context-path: /user-service
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+    min-response-size: 1024
+
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+    initial-instance-info-replication-interval-seconds: 10
+    registry-fetch-interval-seconds: 5
+    healthcheck:
+      enabled: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+    hostname: localhost
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,circuitbreakers,env,loggers,prometheus
+      base-path: /actuator
+    enabled-by-default: true
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+      enabled: true
+    metrics:
+      enabled: true
+    loggers:
+      enabled: true
+    info:
+      enabled: true
+    prometheus:
+      enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+    tags:
+      application: ${spring.application.name}
+    enable:
+      jvm: true
+      system: true
+      logback: true
+
+# JWT Configuration
+jwt:
+  secret: mySuperSecretKeyForJWTGeneration123456789012345678901234567890
+  expiration: 86400000
+  issuer: user-service
+  header: Authorization
+  prefix: "Bearer "
+
+# Resilience4j Circuit Breaker Configuration
+resilience4j:
+  circuitbreaker:
+    instances:
+      userService:
+        registerHealthIndicator: true
+        failureRateThreshold: 50
+        slowCallRateThreshold: 100
+        slowCallDurationThreshold: 2s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        waitDurationInOpenState: 10s
+        automaticTransitionFromOpenToHalfOpenEnabled: false
+        ignoreExceptions:
+          - com.example.userservice.exception.UserAlreadyExistsException
+          - org.springframework.validation.BindException
+  retry:
+    instances:
+      userService:
+        maxAttempts: 3
+        waitDuration: 500ms
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+  timelimiter:
+    instances:
+      userService:
+        timeoutDuration: 3s
+  bulkhead:
+    instances:
+      userService:
+        maxConcurrentCalls: 25
+        maxWaitDuration: 0
+
+# Logging Configuration
+logging:
+  level:
+    com.example.userservice: INFO
+    org.springframework.security: INFO
+    org.springframework.cloud: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+    org.springframework.cloud.gateway: INFO
+    org.springframework.boot.actuate: INFO
+    org.example: DEBUG
+    io.github.resilience4j: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/user-service.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+      total-size-cap: 1GB
+
+# Swagger/OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+    display-request-duration: true
+    filter: true
+  show-actuator: true
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+
+# Custom Application Configuration
+app:
+  security:
+    jwt:
+      expiration-ms: 86400000
+      secret: mySuperSecretKeyForJWTGeneration123456789012345678901234567890
+  cors:
+    allowed-origins: "http://localhost:3000,http://localhost:8080,http://localhost:8099"
+    allowed-methods: "GET,POST,PUT,DELETE,OPTIONS"
+    allowed-headers: "*"
+    allow-credentials: true
+  rate-limit:
+    requests-per-minute: 100
+    burst-capacity: 50
+  features:
+    enable-circuit-breaker: true
+    enable-rate-limiting: true
+    enable-cors: true
+    enable-actuator: true
+
+# Database Connection Pool Monitoring
+decorator:
+  datasource:
+    enable: true
+    enable-p6spy: false
+
+# Health Check Configuration
+health:
+  db:
+    enabled: true
+    query: "SELECT 1"
+    timeout: 2000
+  disk:
+    enabled: true
+    threshold: 10485760
+    path: "."
+info:
+  app:
+    name: User Service
+    description: User Authentication and Management Service
+    version: 1.0.0
