@@ -5,15 +5,7 @@ spring:
     gateway:
       discovery:
         locator:
-          enabled: true
-          lower-case-service-id: true
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowedOrigins: "http://localhost:3000"
-            allowedMethods: "GET,POST,PUT,DELETE,OPTIONS"
-            allowedHeaders: "*"
-            allowCredentials: true
+          enabled: false  # ⬅️ ОТКЛЮЧИТЕ автоматическое обнаружение всех сервисов
       routes:
         - id: task-service
           uri: lb://task-service
@@ -24,6 +16,22 @@ spring:
               args:
                 name: taskService
                 fallbackUri: forward:/fallback/task-service
+        # ⬅️ ДОБАВЬТЕ fallback маршрут
+        - id: task-service-fallback
+          uri: no://op
+          predicates:
+            - Path=/fallback/task-service
+          filters:
+            - name: SetStatus
+              args:
+                status: 503
+            - name: SetResponseHeader
+              args:
+                name: Content-Type
+                value: application/json
+            - name: SetResponseBody
+              args:
+                value: '{"message": "Task Service is temporarily unavailable"}'
 
 server:
   port: 8099
@@ -50,9 +58,9 @@ management:
       show-details: always
       show-components: always
     gateway:
-      access: read_only  # Вместо enabled
+      access: read_only
     routes:
-      access: read_only  # Вместо enabled
+      access: read_only
 
 resilience4j:
   circuitbreaker:
@@ -71,4 +79,3 @@ logging:
     org.springframework.cloud.gateway: DEBUG
     org.springframework.boot.actuate: DEBUG
     org.example.gateway: DEBUG
-    org.springframework.cloud.discovery: DEBUG
