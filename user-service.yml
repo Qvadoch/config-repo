@@ -129,9 +129,6 @@ resilience4j:
         minimumNumberOfCalls: 5
         waitDurationInOpenState: 10s
         automaticTransitionFromOpenToHalfOpenEnabled: false
-        ignoreExceptions:
-          - com.example.userservice.exception.UserAlreadyExistsException
-          - org.springframework.validation.BindException
 
 # Logging Configuration
 logging:
