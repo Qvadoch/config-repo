@@ -32,6 +32,7 @@ eureka:
     prefer-ip-address: true
     lease-renewal-interval-in-seconds: 5
     lease-expiration-duration-in-seconds: 10
+
 management:
   endpoints:
     web:
@@ -44,27 +45,37 @@ management:
     health:
       show-details: always
       show-components: always
+    circuitbreakers:
+      enabled: true
 
 resilience4j:
   circuitbreaker:
-    instances:
-      taskService:
-        registerHealthIndicator: true
+    configs:
+      default:
         slidingWindowSize: 10
         failureRateThreshold: 50
         waitDurationInOpenState: 10s
         permittedNumberOfCallsInHalfOpenState: 3
         automaticTransitionFromOpenToHalfOpenEnabled: true
-  timelimiter:
     instances:
       taskService:
+        baseConfig: default
+        registerHealthIndicator: true
+  timelimiter:
+    configs:
+      default:
         timeoutDuration: 5s
+    instances:
+      taskService:
+        baseConfig: default
 
 logging:
   level:
     org.hibernate.type: TRACE
     org.springframework.orm.jpa: DEBUG
     org.springframework.transaction: DEBUG
+    org.springframework.cloud.circuitbreaker: DEBUG
+    io.github.resilience4j: DEBUG
   pattern:
     level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
   file:
