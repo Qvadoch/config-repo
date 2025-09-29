@@ -7,12 +7,6 @@ spring:
         locator:
           enabled: false
       routes:
-        - id: frontend
-          uri: http://localhost:3000
-          predicates:
-            - Path=/
-          filters:
-            - RewritePath=/(?<segment>.*), /$\{segment}
         - id: task-service
           uri: lb://task-service
           predicates:
@@ -22,15 +16,16 @@ spring:
               args:
                 name: taskService
                 fallbackUri: forward:/fallback/task-service
-        - id: user-service
-          uri: lb://user-service
-          predicates:
-            - Path=/api/auth/**,/api/users/**
-          filters:
-            - name: CircuitBreaker
+            - name: RewritePath
               args:
-                name: userService
-                fallbackUri: forward:/fallback/user-service
+                regexp: /api/(?<segment>.*)
+                replacement: /api/$\{segment}
+        - id: frontend-static
+          uri: http://localhost:3000
+          predicates:
+            - Path=/
+          filters:
+            - SetPath=/
 
 server:
   port: 8099
