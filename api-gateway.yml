@@ -41,15 +41,15 @@ spring:
                 name: taskService
                 fallbackUri: forward:/fallback/task-service
 
-      # ⭐⭐⭐ ДОБАВЬТЕ ЭТУ СЕКЦИЮ ДЛЯ CORS ⭐⭐⭐
       globalcors:
         cors-configurations:
           '[/**]':
-            allowed-origins: "*"
+            allowed-origins:
+              - "http://localhost:3000"
+              - "http://127.0.0.1:3000"
             allowed-methods: "*"
             allowed-headers: "*"
             allow-credentials: true
-            exposed-headers: "*"
 
 server:
   port: 8099
