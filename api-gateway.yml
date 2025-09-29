@@ -44,6 +44,7 @@ eureka:
     initial-instance-info-replication-interval-seconds: 10
     registry-fetch-interval-seconds: 5
   instance:
+    instance-id: ${spring.application.name}:${server.port}
     prefer-ip-address: true
 
 management:
@@ -73,9 +74,7 @@ resilience4j:
     instances:
       taskService:
         baseConfig: default
-      notificationService:
-        baseConfig: default
-      analyticsService:
+      userService:
         baseConfig: default
 
   timelimiter:
@@ -84,6 +83,8 @@ resilience4j:
         timeoutDuration: 5s
     instances:
       taskService:
+        baseConfig: default
+      userService:
         baseConfig: default
 
 logging:
