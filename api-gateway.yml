@@ -8,18 +8,7 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-        - id: user-service-auth
-          uri: lb://user-service
-          predicates:
-            - Path=/auth/**
-          filters:
-            - RewritePath=/auth/(?<segment>.*), /user-service/auth/$\{segment}
-            - name: CircuitBreaker
-              args:
-                name: userService
-                fallbackUri: forward:/fallback/user-service
-
-        - id: user-service-users
+        - id: user-service
           uri: lb://user-service
           predicates:
             - Path=/users/**
