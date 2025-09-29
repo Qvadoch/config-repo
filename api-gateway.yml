@@ -45,20 +45,11 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowed-origins:
-              - "http://localhost:3000"
-              - "http://127.0.0.1:3000"
-              - "http://localhost:8080"
-            allowed-methods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - PATCH
-              - OPTIONS
+            allowed-origins: "*"
+            allowed-methods: "*"
             allowed-headers: "*"
             allow-credentials: true
-            max-age: 3600
+            exposed-headers: "*"
 
 server:
   port: 8099
