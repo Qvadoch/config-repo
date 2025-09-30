@@ -2,7 +2,7 @@ spring:
   application:
     name: task-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/task_bd
+    url: jdbc:postgresql://localhost:5433/task_bd
     username: postgres
     password: 123
     driver-class-name: org.postgresql.Driver
