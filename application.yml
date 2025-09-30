@@ -1,95 +1,26 @@
-# Общие настройки для всех микросервисов
-spring:
-  jackson:
-    serialization:
-      write-dates-as-timestamps: false
-    date-format: com.fasterxml.jackson.databind.util.StdDateFormat
-    time-zone: UTC
-
-  sleuth:
-    sampler:
-      probability: 1.0
-  zipkin:
-    base-url: http://localhost:9411
-
-# Общие настройки Eureka
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
     initial-instance-info-replication-interval-seconds: 10
     registry-fetch-interval-seconds: 5
-    register-with-eureka: true
-    fetch-registry: true
-  instance:
-    instance-id: ${spring.application.name}:${server.port}
-    prefer-ip-address: true
-    lease-renewal-interval-in-seconds: 5
-    lease-expiration-duration-in-seconds: 10
 
-# Общие настройки Actuator
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,loggers,env,beans,configprops
+        include: health,info,metrics
       base-path: /actuator
   endpoint:
     health:
       show-details: always
-      show-components: always
-    metrics:
-      enabled: true
-    prometheus:
-      enabled: true
-  info:
-    env:
-      enabled: true
 
-# Общие настройки Resilience4j
-resilience4j:
-  circuitbreaker:
-    configs:
-      default:
-        slidingWindowSize: 10
-        failureRateThreshold: 50
-        waitDurationInOpenState: 10s
-        permittedNumberOfCallsInHalfOpenState: 3
-        automaticTransitionFromOpenToHalfOpenEnabled: true
-        slowCallRateThreshold: 50
-        slowCallDurationThreshold: 2s
-  timelimiter:
-    configs:
-      default:
-        timeoutDuration: 5s
-  retry:
-    configs:
-      default:
-        maxAttempts: 3
-        waitDuration: 500ms
-
-# Общие настройки логирования
 logging:
-  pattern:
-    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
   level:
     org.springframework.cloud: INFO
-    org.springframework.web: INFO
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.example: DEBUG
 
-# Общие настройки SpringDoc OpenAPI
-springdoc:
-  api-docs:
-    path: /v3/api-docs
-    enabled: true
-  swagger-ui:
-    path: /swagger-ui.html
-    enabled: true
-    operations-sorter: method
-    tags-sorter: alpha
-    display-request-duration: true
-    groups-order: ASC
-  show-actuator: true
+spring:
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
