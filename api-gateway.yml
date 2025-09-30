@@ -8,7 +8,7 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-        # Маршрут для аутентификации - БЕЗ RewritePath
+        # Маршрут для аутентификации
         - id: auth-service
           uri: lb://user-service
           predicates:
@@ -20,7 +20,7 @@ spring:
                 name: userService
                 fallbackUri: forward:/fallback/user-service
 
-        # Маршрут для пользователей - БЕЗ RewritePath
+        # Маршрут для пользователей
         - id: user-service
           uri: lb://user-service
           predicates:
@@ -42,11 +42,14 @@ spring:
               args:
                 name: taskService
                 fallbackUri: forward:/fallback/task-service
+
+        # Маршрут для поиска - ИСПРАВЛЕННЫЙ
         - id: search-service
           uri: lb://search-service
           predicates:
             - Path=/api/search/**
           filters:
+            - RewritePath=/api/search/(?<segment>.*), /api/search/$\{segment}
             - name: CircuitBreaker
               args:
                 name: searchService
@@ -58,7 +61,6 @@ spring:
             allowed-origins:
               - "http://localhost:3000"
               - "http://127.0.0.1:3000"
-              - "http://localhost:8080"
             allowed-methods:
               - GET
               - POST
@@ -116,6 +118,8 @@ resilience4j:
         baseConfig: default
       userService:
         baseConfig: default
+      searchService:
+        baseConfig: default
 
   timelimiter:
     configs:
@@ -125,6 +129,8 @@ resilience4j:
       taskService:
         baseConfig: default
       userService:
+        baseConfig: default
+      searchService:
         baseConfig: default
 
 logging:
