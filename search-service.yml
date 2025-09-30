@@ -28,16 +28,31 @@ eureka:
     instance-id: ${spring.application.name}:${server.port}
     prefer-ip-address: true
 
+feign:
+  client:
+    config:
+      default:
+        connect-timeout: 5000
+        read-timeout: 30000
+  circuitbreaker:
+    enabled: true
+
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,circuitbreakers
+        include: health,info,metrics,circuitbreakers,prometheus
       base-path: /actuator
   endpoint:
     health:
       show-details: always
       show-components: always
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
 
 resilience4j:
   circuitbreaker:
@@ -48,12 +63,15 @@ resilience4j:
         waitDurationInOpenState: 10s
         permittedNumberOfCallsInHalfOpenState: 3
         automaticTransitionFromOpenToHalfOpenEnabled: true
+        slowCallRateThreshold: 50
+        slowCallDurationThreshold: 3s
     instances:
       searchService:
         baseConfig: default
         registerHealthIndicator: true
       taskService:
         baseConfig: default
+        registerHealthIndicator: true
   timelimiter:
     configs:
       default:
@@ -63,6 +81,11 @@ resilience4j:
         baseConfig: default
       taskService:
         baseConfig: default
+  retry:
+    configs:
+      default:
+        maxAttempts: 3
+        waitDuration: 500ms
 
 logging:
   level:
@@ -73,6 +96,7 @@ logging:
     org.springframework.orm.jpa: DEBUG
     org.springframework.transaction: DEBUG
     io.github.resilience4j: DEBUG
+    org.springframework.cloud.openfeign: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %5p [%15.15t] [%X{traceId:-}] %-40.40logger{39} : %m%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} - %5p [%15.15t] [%X{traceId:-}] %-40.40logger{39} : %m%n"
