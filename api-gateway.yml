@@ -42,6 +42,15 @@ spring:
               args:
                 name: taskService
                 fallbackUri: forward:/fallback/task-service
+        - id: search-service
+          uri: lb://search-service
+          predicates:
+            - Path=/api/search/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: searchService
+                fallbackUri: forward:/fallback/search-service
 
       globalcors:
         cors-configurations:
