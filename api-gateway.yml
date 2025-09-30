@@ -8,23 +8,29 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-        # Маршрут для аутентификации
-        - id: auth-service-direct
+        # Маршрут для аутентификации - БЕЗ RewritePath
+        - id: auth-service
           uri: lb://user-service
           predicates:
             - Path=/auth/**
           filters:
-            - RewritePath=/auth/(?<segment>.*), /$\{segment}
+            - PrefixPath=/user-service
             - name: CircuitBreaker
+              args:
+                name: userService
+                fallbackUri: forward:/fallback/user-service
 
-        # Маршрут для пользователей
-        - id: user-service-direct
+        # Маршрут для пользователей - БЕЗ RewritePath
+        - id: user-service
           uri: lb://user-service
           predicates:
             - Path=/users/**
           filters:
-            - RewritePath=/users/(?<segment>.*), /$\{segment}
+            - PrefixPath=/user-service
             - name: CircuitBreaker
+              args:
+                name: userService
+                fallbackUri: forward:/fallback/user-service
 
         # Маршрут для задач
         - id: task-service
@@ -33,6 +39,9 @@ spring:
             - Path=/api/tasks/**
           filters:
             - name: CircuitBreaker
+              args:
+                name: taskService
+                fallbackUri: forward:/fallback/task-service
 
       globalcors:
         cors-configurations:
