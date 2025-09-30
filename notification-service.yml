@@ -52,6 +52,28 @@ management:
     health:
       show-details: always
 
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+    instances:
+      notificationService:
+        baseConfig: default
+        registerHealthIndicator: true
+
+  timelimiter:
+    configs:
+      default:
+        timeoutDuration: 5s
+    instances:
+      notificationService:
+        baseConfig: default
+        
 springdoc:
   api-docs:
     path: /v3/api-docs

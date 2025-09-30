@@ -43,6 +43,13 @@ spring:
                 name: taskService
                 fallbackUri: forward:/fallback/task-service
 
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/notifications/**
+          filters:
+            - RewritePath=/notifications/(?<segment>.*), /notification-service/notifications/$\{segment}
+
       globalcors:
         cors-configurations:
           '[/**]':
