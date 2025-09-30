@@ -78,6 +78,7 @@ logging:
     org.springframework.transaction: DEBUG
     org.springframework.cloud.circuitbreaker: DEBUG
     io.github.resilience4j: DEBUG
+    org.springframework.data.jpa: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %5p [%15.15t] [%X{traceId:-}] %-40.40logger{39} : %m%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} - %5p [%15.15t] [%X{traceId:-}] %-40.40logger{39} : %m%n"

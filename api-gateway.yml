@@ -8,7 +8,6 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-        # Маршрут для аутентификации
         - id: auth-service
           uri: lb://user-service
           predicates:
@@ -19,8 +18,6 @@ spring:
               args:
                 name: userService
                 fallbackUri: forward:/fallback/user-service
-
-        # Маршрут для пользователей
         - id: user-service
           uri: lb://user-service
           predicates:
@@ -31,8 +28,6 @@ spring:
               args:
                 name: userService
                 fallbackUri: forward:/fallback/user-service
-
-        # Маршрут для задач
         - id: task-service
           uri: lb://task-service
           predicates:
@@ -42,8 +37,6 @@ spring:
               args:
                 name: taskService
                 fallbackUri: forward:/fallback/task-service
-
-        # Маршрут для поиска - ИСПРАВЛЕННЫЙ
         - id: search-service
           uri: lb://search-service
           predicates:
@@ -54,7 +47,6 @@ spring:
               args:
                 name: searchService
                 fallbackUri: forward:/fallback/search-service
-
       globalcors:
         cors-configurations:
           '[/**]':
@@ -83,26 +75,26 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
-    initial-instance-info-replication-interval-seconds: 10
-    registry-fetch-interval-seconds: 5
-  instance:
-    instance-id: ${spring.application.name}:${server.port}
-    prefer-ip-address: true
 
 management:
   endpoints:
     web:
       exposure:
-        include: gateway,health,info,metrics,routes
+        include: gateway,health,info,metrics,routes,circuitbreakers,prometheus
       base-path: /actuator
   endpoint:
     health:
       show-details: always
-      show-components: always
     gateway:
       access: read_only
     routes:
       access: read_only
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
 
 resilience4j:
   circuitbreaker:
@@ -113,14 +105,18 @@ resilience4j:
         waitDurationInOpenState: 10s
         permittedNumberOfCallsInHalfOpenState: 3
         automaticTransitionFromOpenToHalfOpenEnabled: true
+        slowCallRateThreshold: 50
+        slowCallDurationThreshold: 3s
     instances:
       taskService:
         baseConfig: default
+        registerHealthIndicator: true
       userService:
         baseConfig: default
+        registerHealthIndicator: true
       searchService:
         baseConfig: default
-
+        registerHealthIndicator: true
   timelimiter:
     configs:
       default:
@@ -138,8 +134,13 @@ logging:
     org.springframework.cloud.gateway: DEBUG
     org.springframework.cloud.circuitbreaker: DEBUG
     reactor.netty: DEBUG
+    io.github.resilience4j: DEBUG
     org.example.gateway: INFO
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %5p [%15.15t] [%X{traceId:-}] %-40.40logger{39} : %m%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} - %5p [%15.15t] [%X{traceId:-}] %-40.40logger{39} : %m%n"
   file:
     name: logs/api-gateway.log
+    max-size: 10MB
+    max-history: 7
+    total-size-cap: 100MB

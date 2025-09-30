@@ -70,3 +70,14 @@ logging:
     org.springframework.data.jpa: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.orm.jpa: DEBUG
+    org.springframework.transaction: DEBUG
+    io.github.resilience4j: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %5p [%15.15t] [%X{traceId:-}] %-40.40logger{39} : %m%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} - %5p [%15.15t] [%X{traceId:-}] %-40.40logger{39} : %m%n"
+  file:
+    name: logs/search-service.log
+    max-size: 10MB
+    max-history: 7
+    total-size-cap: 100MB
