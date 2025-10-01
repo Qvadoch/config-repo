@@ -52,15 +52,6 @@ management:
     env:
       enabled: true
 
-springdoc:
-  api-docs:
-    path: /v3/api-docs
-  swagger-ui:
-    path: /swagger-ui.html
-    operations-sorter: method
-    tags-sorter: alpha
-    display-request-duration: true
-
 resilience4j:
   circuitbreaker:
     instances:
