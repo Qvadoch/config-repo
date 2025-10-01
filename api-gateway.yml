@@ -37,6 +37,10 @@ spring:
               args:
                 name: taskService
                 fallbackUri: forward:/fallback/task-service
+                failureRateThreshold: 1      # 1% ошибок = открытие
+                minimumNumberOfCalls: 1      # минимум 1 вызов
+                slidingWindowSize: 1         # окно 1 вызов
+                waitDurationInOpenState: 10s
         - id: search-service
           uri: lb://search-service
           predicates:
