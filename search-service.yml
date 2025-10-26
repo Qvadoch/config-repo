@@ -2,7 +2,7 @@ spring:
   application:
     name: search-service
   datasource:
-    url: jdbc:postgresql://postgres:5432/search_bd  # ← ИСПРАВЛЕНО
+    url: jdbc:postgresql://postgres:5433/search_bd  # ← ИСПРАВЛЕНО
     username: postgres
     password: 123
     driver-class-name: org.postgresql.Driver
