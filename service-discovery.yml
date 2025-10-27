@@ -10,7 +10,7 @@ eureka:
     register-with-eureka: false
     fetch-registry: false
     service-url:
-      defaultZone: http://service-discovery:8761/eureka/
+      defaultZone: https://service-discovery.onrender.com/eureka/
   instance:
     hostname: localhost
     prefer-ip-address: true

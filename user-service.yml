@@ -27,7 +27,7 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: http://service-discovery:8761/eureka
+      defaultZone: https://service-discovery.onrender.com/eureka/
     register-with-eureka: true
     fetch-registry: true
   instance:
